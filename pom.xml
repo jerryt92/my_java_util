@@ -37,7 +37,7 @@
 <!--                            <archive>-->
 <!--                                <manifest>-->
 <!--                                    <mainClass>-->
-<!--                                        com.tjl.util.MessageDigestUtil-->
+<!--                                        com.tjl.util.security.MessageDigestUtil-->
 <!--                                    </mainClass>-->
 <!--                                </manifest>-->
 <!--                            </archive>-->

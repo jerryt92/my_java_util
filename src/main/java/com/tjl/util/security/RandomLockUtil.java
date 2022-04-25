@@ -1,19 +1,6 @@
-package com.tjl.util;
+package com.tjl.util.security;
 
-public class Main {
-    public static void main(String[] args) {
-        String username = "tjl";
-        String password = "123";
-        String key = mkKey(username, password);
-        String lockStr = lock(key);
-        String unlockStr = unlock(lockStr);
-        System.out.println("key：" + key);
-        System.out.println("加密后：" + lockStr);
-        System.out.println("解密后：" + unlockStr);
-        System.out.println("username：" + trans(unlockStr, 1));
-        System.out.println("password：" + trans(unlockStr, 2));
-    }
-
+public class RandomLockUtil {
     public static String lock(String str) {
         char[] chars = str.toCharArray();
         String ret = "";
@@ -70,5 +57,18 @@ public class Main {
             return password;
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        String username = "tjl";
+        String password = "123";
+        String key = mkKey(username, password);
+        String lockStr = lock(key);
+        String unlockStr = unlock(lockStr);
+        System.out.println("key：" + key);
+        System.out.println("加密后：" + lockStr);
+        System.out.println("解密后：" + unlockStr);
+        System.out.println("username：" + trans(unlockStr, 1));
+        System.out.println("password：" + trans(unlockStr, 2));
     }
 }
