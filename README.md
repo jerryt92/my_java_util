@@ -2,7 +2,11 @@
 
 [Jar包下载](target/TJLUtil-1.0.jar)
 
-# JDK JCE 限制和无限制
+## 关于AES-256的限制
+
+在使用AES-256时出现
+
+`Exception in thread "main" java.security.InvalidKeyException: Illegal key size`
 
 Java Cryptography Extension (JCE)
 
@@ -27,3 +31,5 @@ Java Cryptography Extension (JCE)
 [JDK8](file/JcePolicy/jce_policy-8.zip)
 
 将两个jar文件放到%JDK_HOME%\jre\lib\security 和 %JRE_HOME%\lib\security下覆盖原来文件即可
+
+**注：最新版本的JDK似乎已经解除限制**

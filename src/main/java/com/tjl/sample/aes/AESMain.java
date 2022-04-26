@@ -11,7 +11,7 @@ public class AESMain {
         String message = "Hello, world!";
         System.out.println("Message: " + message);
         // 128位密钥 = 16 bytes Key:
-        byte[] key = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".getBytes("UTF-8");
+        byte[] key = "AAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEE".getBytes("UTF-8");
         // 加密:
         byte[] data = message.getBytes("UTF-8");
         byte[] locked = aesLock(key, data);
