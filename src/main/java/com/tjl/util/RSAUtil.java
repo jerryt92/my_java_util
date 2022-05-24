@@ -1,4 +1,4 @@
-package com.tjl.util.security;
+package com.tjl.util;
 
 import javax.crypto.Cipher;
 import java.math.BigInteger;

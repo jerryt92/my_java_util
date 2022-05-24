@@ -1,4 +1,4 @@
-package com.tjl.util.security;
+package com.tjl.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
  * 信息摘要工具类
  * @author TianJingli
  */
-public class MessageDigestUtil {
+public class MDUtil {
     /**
      * 信息摘要
      * @param data

@@ -1,6 +1,19 @@
-package com.tjl.util.security;
+package com.tjl.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
+/**
+ * 可以产生随机的密文，或根据密文解析出原文
+ * @author tjl
+ */
 public class RandomLockUtil {
+    /**
+     * 生成密文
+     * @param str
+     * @return
+     */
     public static String lock(String str) {
         char[] chars = str.toCharArray();
         String ret = "";
@@ -13,10 +26,25 @@ public class RandomLockUtil {
             chars[i] += (magic - 32);
             ret += chars[i];
         }
+        try {
+            ret = URLEncoder.encode(ret, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
         return ret;
     }
 
+    /**
+     * 解出原文
+     * @param str
+     * @return
+     */
     public static String unlock(String str) {
+        try {
+            str = URLDecoder.decode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
         char[] chars = str.toCharArray();
         String ret = "";
         int flag = chars[0];
@@ -27,38 +55,55 @@ public class RandomLockUtil {
         return ret;
     }
 
-    public static  String mkKey(String username, String password) {
+    /**
+     * 将两个字符串（如用户名和密码）合并为一个字符串
+     * @param str1
+     * @param str2
+     * @return
+     */
+    public static  String mkKey(String str1, String str2) {
         int checkNumberLen, checkNumber;
-        checkNumber = username.length();
+        checkNumber = str1.length();
         checkNumberLen = ("" + checkNumber).length();
-        return "" + checkNumberLen + checkNumber + username + password;
+        return "" + checkNumberLen + checkNumber + str1 + str2;
     }
+
+    /**
+     * 从上个方法的字符串中解析出str1或str2
+     * @param key
+     * @param swi （传入1表示解析出str1，2表示解析出str2）
+     * @return
+     */
     public static  String trans(String key, int swi) {
-        String username = "";
-        String password = "";
+        String str1 = "";
+        String str2 = "";
         String str = "";
         char[] chars = key.toCharArray();
         int checkNumberLen = Integer.parseInt("" + chars[0]);
-        int usernameLen;
+        int str1Len;
         for (int i = 1; i <= checkNumberLen; i ++) {
             str += chars[i];
         }
-        usernameLen = Integer.parseInt(str);
+        str1Len = Integer.parseInt(str);
         if (swi == 1) {
-            for (int i = checkNumberLen + 1; i <= usernameLen + checkNumberLen; i ++) {
-                username += chars[i];
+            for (int i = checkNumberLen + 1; i <= str1Len + checkNumberLen; i ++) {
+                str1 += chars[i];
             }
-            return username;
+            return str1;
         }
         else if (swi == 2) {
-            for (int i = usernameLen + checkNumberLen + 1; i < chars.length; i ++) {
-                password += chars[i];
+            for (int i = str1Len + checkNumberLen + 1; i < chars.length; i ++) {
+                str2 += chars[i];
             }
-            return password;
+            return str2;
         }
         return null;
     }
 
+    /**
+     * Demo
+     * @param args
+     */
     public static void main(String[] args) {
         String username = "tjl";
         String password = "123";

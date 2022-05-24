@@ -1,9 +1,9 @@
-package com.tjl.sample.aes;
+package com.tjl.sample.security;
 
 import java.util.Base64;
 
-import static com.tjl.util.security.AESUtil.aesLock;
-import static com.tjl.util.security.AESUtil.aesUnlock;
+import static com.tjl.util.AESUtil.aesLock;
+import static com.tjl.util.AESUtil.aesUnlock;
 
 public class AESMain {
     public static void main(String[] args) throws Exception {
@@ -11,7 +11,7 @@ public class AESMain {
         String message = "Hello, world!";
         System.out.println("Message: " + message);
         // 128位密钥 = 16 bytes Key:
-        byte[] key = "AAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEE".getBytes("UTF-8");
+        byte[] key = "abcdefghijklmnopabcdefghijklmnop".getBytes("UTF-8");
         // 加密:
         byte[] data = message.getBytes("UTF-8");
         byte[] locked = aesLock(key, data);
