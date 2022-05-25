@@ -1,4 +1,4 @@
-package com.tjl.userTruthChainDemo.jdbcutil;
+package com.tjl.userTruthCircleDemo.jdbcutil;
 
 import java.sql.*;
 

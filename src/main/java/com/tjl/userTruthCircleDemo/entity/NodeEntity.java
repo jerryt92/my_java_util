@@ -1,4 +1,4 @@
-package com.tjl.userTruthChainDemo.entity;
+package com.tjl.userTruthCircleDemo.entity;
 
 import com.tjl.util.MDUtil;
 import javax.crypto.Cipher;
@@ -8,35 +8,67 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Base64;
 
 public class NodeEntity {
+    private String id;
     private String p_id;
-
     private String p_key;
     private String c_id;
-
     private String c_key;
-    private String id;
     private String aesData;
 
-    public NodeEntity(String p_id, String p_key, String c_id, String c_key, String id, String password) throws GeneralSecurityException {
+    public NodeEntity() {
+    }
+
+    public NodeEntity(String id, String p_id, String p_key, String c_id, String c_key, String password) throws GeneralSecurityException {
         password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        this.id = id;
         this.p_id = p_id;
         this.p_key = aesLock(password, p_key);
         this.c_id = c_id;
         this.c_key = aesLock(password, c_key);
-        this.id = id;
         this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     public String getP_id() {
         return p_id;
     }
 
     public void setP_id(String p_id) {
         this.p_id = p_id;
+    }
+
+    public void setP_id(String p_id, String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        this.p_id = p_id;
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+    }
+
+    public String getP_key() {
+        return p_key;
+    }
+
+    public String getP_key(String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        return aesUnlock(password, p_key);
+    }
+
+    public void setP_key(String p_key) {
+        this.p_key = p_key;
+    }
+
+    public void setP_key(String p_key, String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        this.p_key = aesLock(password, p_key);
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
     }
 
     public String getC_id() {
@@ -47,13 +79,31 @@ public class NodeEntity {
         this.c_id = c_id;
     }
 
-    public String getId() {
-        return id;
+    public void setC_id(String c_id, String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        this.c_id = c_id;
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getC_key() {
+        return c_key;
     }
+
+    public String getC_key(String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        return aesUnlock(password, c_key);
+    }
+
+    public void setC_key(String c_key) {
+        this.c_key = c_key;
+    }
+
+    public void setC_key(String c_key, String password) throws GeneralSecurityException {
+        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+        this.c_key = aesLock(password, c_key);
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+    }
+
 
     public String getAesData() {
         return aesData;
@@ -72,11 +122,20 @@ public class NodeEntity {
         System.out.println("-------------------------------------------------");
     }
 
-    public boolean verifySelf(String password) throws GeneralSecurityException {
-        password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
-        System.out.println(MDUtil.getMessageDigest(this.toString(), "SHA-256"));
-        System.out.println(aesUnlock(password, this.aesData));
-        return MDUtil.getMessageDigest(this.toString(), "SHA-256").equals(aesUnlock(password, this.aesData));
+    public boolean verifySelf(String password) {
+        try {
+            password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
+            if (MDUtil.getMessageDigest(this.toString(), "SHA-256").equals(aesUnlock(password, this.aesData))) {
+                return true;
+            }
+            System.out.println("结点遭到篡改！");
+            System.out.println("结点 [" + this.id + "] 验证不通过！");
+            return false;
+        } catch (Exception e) {
+            System.out.println("密钥错误或结点遭到篡改！");
+            System.out.println("结点 [" + this.id + "] 验证不通过！");
+            return false;
+        }
     }
 
     @Override
@@ -89,7 +148,6 @@ public class NodeEntity {
                 ", id='" + id + '\'' +
                 '}';
     }
-
     /**
      * AES加密
      * @param key AES密钥必须为16位(AES-128)或32位(AES-256)
@@ -97,8 +155,8 @@ public class NodeEntity {
      * @return locked
      * @throws GeneralSecurityException
      */
-    public static String aesLock(String key, String data) throws GeneralSecurityException {
-        String locked;
+    private static String aesLock(String key, String data) throws GeneralSecurityException {
+        String locked = "";
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         SecretKey keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, keySpec);
@@ -113,8 +171,8 @@ public class NodeEntity {
      * @return unlocked
      * @throws GeneralSecurityException
      */
-    public static String aesUnlock(String key, String data) throws GeneralSecurityException {
-        String unlocked;
+    private static String aesUnlock(String key, String data) throws GeneralSecurityException {
+        String unlocked = "";
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         SecretKey keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.DECRYPT_MODE, keySpec);
@@ -134,7 +192,6 @@ public class NodeEntity {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] bytes = md.digest(data);
-
             // 将字节数据转换为十六进制
             for (byte b : bytes) {
                 stringBuilder.append(String.format("%02x", b));
