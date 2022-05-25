@@ -11,13 +11,11 @@ public class AESMain {
         String message = "Hello, world!";
         System.out.println("Message: " + message);
         // 128位密钥 = 16 bytes Key:
-        byte[] key = "abcdefghijklmnopabcdefghijklmnop".getBytes("UTF-8");
+        String key = "abcdefghijklmnopabcdefghijklmnop";
         // 加密:
-        byte[] data = message.getBytes("UTF-8");
-        byte[] locked = aesLock(key, data);
-        System.out.println("Encrypted: " + Base64.getEncoder().encodeToString(locked));
+        String locked = aesLock(key, message);
+        System.out.println("locked: " + locked);
         // 解密:
-        byte[] unlocked = aesUnlock(key, locked);
-        System.out.println("Decrypted: " + new String(unlocked, "UTF-8"));
+        System.out.println("unlock: " + aesUnlock(key, locked));
     }
 }

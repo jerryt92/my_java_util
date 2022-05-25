@@ -61,7 +61,7 @@ public class RandomLockUtil {
      * @param str2
      * @return
      */
-    public static  String mkKey(String str1, String str2) {
+    public static String mkKey(String str1, String str2) {
         int checkNumberLen, checkNumber;
         checkNumber = str1.length();
         checkNumberLen = ("" + checkNumber).length();
@@ -98,6 +98,71 @@ public class RandomLockUtil {
             return str2;
         }
         return null;
+    }
+
+    public static String mkArrToString(String[] strings) throws Exception {
+        String ret = "";
+        int arrSizeNumberLen,arrSizeNumber;
+        arrSizeNumber = strings.length;
+        arrSizeNumberLen = ( "" + arrSizeNumber ).length();
+        if (arrSizeNumber > 9) // 一般不太可能，以防万一
+        {
+            throw new Exception("Arr too big!");
+        }
+        ret += arrSizeNumberLen;
+        ret += arrSizeNumber;
+        for (String elementStr : strings) {
+            ret += ( "" + elementStr.length() ).length();
+            ret += elementStr.length();
+            ret += elementStr;
+        }
+        return ret;
+    }
+
+    public static String[] getStringArrFromOneSting(String string) throws Exception {
+        char[] stringCharArr = string.toCharArray();
+        int arrSizeNumberLen = Integer.parseInt("" + stringCharArr[0]);
+        int arrSizeNumber = 0;
+        switch (arrSizeNumberLen) {
+            case 1 : {
+                arrSizeNumber = Integer.parseInt("" + stringCharArr[1]);
+                break;
+            }
+            case 2 : {
+                arrSizeNumber = Integer.parseInt("" + stringCharArr[1] + "" + stringCharArr[2]);
+                break;
+            }
+            default : {
+                throw new Exception("Illegal String!");
+            }
+        }
+        String[] strings = new String[arrSizeNumber];
+        int elementHeadIndex = arrSizeNumberLen + 1;
+        int elementSizeNumberLen = 0;
+        int elementSizeNumber = 0;
+        for (int i = 0; i < arrSizeNumber; i ++) {
+            elementSizeNumberLen = Integer.parseInt( "" + stringCharArr[elementHeadIndex] );
+            switch (elementSizeNumberLen) {
+                case 1 : {
+                    elementSizeNumber = Integer.parseInt("" + stringCharArr[elementHeadIndex + 1]);
+                    break;
+                }
+                case 2 : {
+                    elementSizeNumber = Integer.parseInt("" + stringCharArr[elementHeadIndex + 1] + "" + stringCharArr[elementHeadIndex + 2]);
+                    break;
+                }
+                default : {
+                    throw new Exception("Illegal String!");
+                }
+            }
+            String elementStr = "";
+            for (int j = elementHeadIndex + elementSizeNumberLen + 1; j < elementHeadIndex + elementSizeNumberLen + elementSizeNumber + 1; j ++) {
+                elementStr += stringCharArr[j];
+            }
+            strings[i] = elementStr;
+            elementHeadIndex += elementSizeNumberLen + elementSizeNumber + 1;
+        }
+        return strings;
     }
 
     /**
