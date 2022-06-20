@@ -1,66 +1,162 @@
 package com.tjl.util;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import java.math.BigInteger;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.spec.*;
+import java.util.Base64;
 
+/**
+ * RSA工具类
+ *
+ * @author TianJingli
+ */
 public class RSAUtil {
-    public static void main(String[] args) throws Exception {
-        // 明文:
-        byte[] plain = "Hello, encrypt use RSA".getBytes("UTF-8");
-        // 创建公钥／私钥对:
-        Person alice = new Person("Alice");
-        // 用Alice的公钥加密:
-        byte[] pk = alice.getPublicKey();
-        System.out.println(String.format("public key: %x", new BigInteger(1, pk)));
-        byte[] encrypted = alice.encrypt(plain);
-        System.out.println(String.format("encrypted: %x", new BigInteger(1, encrypted)));
-        // 用Alice的私钥解密:
-        byte[] sk = alice.getPrivateKey();
-        System.out.println(String.format("private key: %x", new BigInteger(1, sk)));
-        byte[] decrypted = alice.decrypt(encrypted);
-        System.out.println(new String(decrypted, "UTF-8"));
-    }
-}
-
-class Person {
-    String name;
-    // 私钥:
-    PrivateKey sk;
-    // 公钥:
-    PublicKey pk;
-
-    public Person(String name) throws GeneralSecurityException {
-        this.name = name;
-        // 生成公钥／私钥对:
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
-        kpGen.initialize(1024);
-        KeyPair kp = kpGen.generateKeyPair();
-        this.sk = kp.getPrivate();
-        this.pk = kp.getPublic();
+    /**
+     * 获取RSA公钥/私钥对
+     *
+     * @return
+     */
+    public static KeyPair getRSAKeyPair() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(1024);
+            return keyPairGenerator.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    // 把私钥导出为字节
-    public byte[] getPrivateKey() {
-        return this.sk.getEncoded();
+    /**
+     * 把公钥导出为字节
+     *
+     * @param publicKey
+     * @return
+     */
+    public static byte[] getPublicKeyBytes(PublicKey publicKey) {
+        return publicKey.getEncoded();
     }
 
-    // 把公钥导出为字节
-    public byte[] getPublicKey() {
-        return this.pk.getEncoded();
+    /**
+     * 把字节转换为公钥
+     *
+     * @param publicKeyBytes
+     * @return
+     */
+    public static PublicKey getPublicKeyFromBytes(byte[] publicKeyBytes) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+            return publicKey;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 把私钥导出为字节
+     *
+     * @param privateKey
+     * @return
+     */
+    public static byte[] getPrivateKeyBytes(PrivateKey privateKey) {
+        return privateKey.getEncoded();
+    }
+
+    /**
+     * 把字节转换为私钥
+     *
+     * @param privateKeyBytes
+     * @return
+     */
+    public static PrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            return privateKey;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // 用公钥加密:
-    public byte[] encrypt(byte[] message) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, this.pk);
-        return cipher.doFinal(message);
+    public static byte[] encrypt(byte[] data, PublicKey publicKey) {
+        Cipher cipher = null;
+        try {
+            cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return cipher.doFinal(data);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // 用私钥解密:
-    public byte[] decrypt(byte[] input) throws GeneralSecurityException {
+    public static byte[] decrypt(byte[] encrypted, PrivateKey privateKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(encrypted);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 用私钥进行签名
+     *
+     * @param data
+     * @param privateKey
+     * @return
+     */
+    public static byte[] sign(byte[] data, PrivateKey privateKey) {
+        Cipher cipher = null;
+        try {
+            cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            return cipher.doFinal(data);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 用公钥解密签名
+     */
+    public static byte[] decryptSign(byte[] signedData, PublicKey publicKey) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, this.sk);
-        return cipher.doFinal(input);
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        return cipher.doFinal(signedData);
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException, GeneralSecurityException {
+
+        // 加密解密演示
+
+        String msg = "Hello RSA.";
+        System.out.println("原文：" + msg);
+        KeyPair keyPair = getRSAKeyPair();
+        String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
+        String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
+        System.out.println("PublicKey : " + publicKeyStr);
+        System.out.println("PrivateKey : " + privateKeyStr);
+        String encrypted = Base64.getEncoder().encodeToString(encrypt(msg.getBytes(StandardCharsets.UTF_8), getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr))));
+        System.out.println("Encrypted : " + encrypted);
+        System.out.println("Decrypted : " + new String(decrypt(Base64.getDecoder().decode(encrypted), getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr))), "UTF-8"));
+
+        // 数字签名演示
+
+        String myInfo = "TianJingli";
+        String signed = Base64.getEncoder().encodeToString(sign(myInfo.getBytes(StandardCharsets.UTF_8), keyPair.getPrivate()));
+        System.out.println("Signed : " + signed);
+        System.out.println("Signer : "+new String(decryptSign(Base64.getDecoder().decode(signed),keyPair.getPublic()),"UTF-8"));
     }
 }

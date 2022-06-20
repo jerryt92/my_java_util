@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
+import java.util.UUID;
 
 /**
  * @author TianJingli
@@ -18,29 +19,25 @@ public class AESUtil {
      * @return locked
      * @throws GeneralSecurityException
      */
-    public static String aesLock(String key, String data) throws GeneralSecurityException {
-        String locked;
+    public static byte[] aesEncrypt(byte[] data,byte[] key) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        SecretKey keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+        SecretKey keySpec = new SecretKeySpec(key,"AES");
         cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-        locked = Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes(StandardCharsets.UTF_8)));
-        return locked;
+        return cipher.doFinal(data);
     }
 
     /**
      * AES解密
      * @param key AES密钥必须为16位(AES-128)或32位(AES-256)
-     * @param data
+     * @param encryptData
      * @return unlocked
      * @throws GeneralSecurityException
      */
-    public static String aesUnlock(String key, String data) throws GeneralSecurityException {
-        String unlocked;
+    public static byte[] aesDecrypt(byte[] encryptData,byte[] key) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        SecretKey keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+        SecretKey keySpec = new SecretKeySpec(key,"AES");
         cipher.init(Cipher.DECRYPT_MODE, keySpec);
-        unlocked = new String(cipher.doFinal(Base64.getDecoder().decode(data)));
-        return unlocked;
+        return cipher.doFinal(encryptData);
     }
 
     public static void main(String[] args) throws Exception {
@@ -48,11 +45,12 @@ public class AESUtil {
         String message = "Hello, world!";
         System.out.println("Message: " + message);
         // 128位密钥 = 16 bytes Key:
-        String key = "abcdefghijklmnopabcdefghijklmnop";
+        String key = UUID.randomUUID().toString().replace("-","").substring(0, 16);
+        System.out.println(key);
         // 加密:
-        String locked = aesLock(key, message);
-        System.out.println("locked: " + locked);
+        String encrypted = Base64.getEncoder().encodeToString(aesEncrypt(message.getBytes(StandardCharsets.UTF_8),key.getBytes()));
+        System.out.println("encrypted: " + encrypted);
         // 解密:
-        System.out.println("unlock: " + aesUnlock(key, locked));
+        System.out.println("decrypted: " + new String(aesDecrypt(Base64.getDecoder().decode(encrypted),key.getBytes(StandardCharsets.UTF_8)),"UTF8"));
     }
 }

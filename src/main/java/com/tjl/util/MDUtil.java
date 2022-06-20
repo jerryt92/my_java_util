@@ -15,12 +15,11 @@ public class MDUtil {
      * @param algorithm 可选：MD5 、 SHA-1 、 SHA-256 、 SHA-384 、 SHA-512
      * @return
      */
-    public static String getMessageDigest(String data, String algorithm) {
+    public static String getMessageDigest(byte[] data, String algorithm) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
-            byte[] bytes = md.digest(data.getBytes(StandardCharsets.UTF_8));
-
+            byte[] bytes = md.digest(data);
             // 将字节数据转换为十六进制
             for (byte b : bytes) {
                 stringBuilder.append(String.format("%02x", b));
@@ -29,5 +28,10 @@ public class MDUtil {
             e.printStackTrace();
         }
         return stringBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        String msg = "11111111111111111111";
+        System.out.println(getMessageDigest(msg.getBytes(StandardCharsets.UTF_8),"md5"));
     }
 }

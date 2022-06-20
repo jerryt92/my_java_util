@@ -28,7 +28,7 @@ public class NodeEntity {
         this.p_key = aesLock(password, p_key);
         this.c_id = c_id;
         this.c_key = aesLock(password, c_key);
-        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256"));
     }
 
     public String getId() {
@@ -49,7 +49,7 @@ public class NodeEntity {
     public void setP_id(String p_id, String password) throws GeneralSecurityException {
         password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
         this.p_id = p_id;
-        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256"));
     }
 
     public String getP_key() {
@@ -68,7 +68,7 @@ public class NodeEntity {
     public void setP_key(String p_key, String password) throws GeneralSecurityException {
         password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
         this.p_key = aesLock(password, p_key);
-        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256"));
     }
 
     public String getC_id() {
@@ -82,7 +82,7 @@ public class NodeEntity {
     public void setC_id(String c_id, String password) throws GeneralSecurityException {
         password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
         this.c_id = c_id;
-        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256"));
     }
 
     public String getC_key() {
@@ -101,7 +101,7 @@ public class NodeEntity {
     public void setC_key(String c_key, String password) throws GeneralSecurityException {
         password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
         this.c_key = aesLock(password, c_key);
-        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString(), "SHA-256"));
+        this.aesData = aesLock(password, MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256"));
     }
 
 
@@ -125,7 +125,7 @@ public class NodeEntity {
     public boolean verifySelf(String password) {
         try {
             password = getMessageDigest(password.getBytes(StandardCharsets.UTF_8), "MD5");
-            if (MDUtil.getMessageDigest(this.toString(), "SHA-256").equals(aesUnlock(password, this.aesData))) {
+            if (MDUtil.getMessageDigest(this.toString().getBytes(StandardCharsets.UTF_8), "SHA-256").equals(aesUnlock(password, this.aesData))) {
                 return true;
             }
             System.out.println("结点遭到篡改！");
