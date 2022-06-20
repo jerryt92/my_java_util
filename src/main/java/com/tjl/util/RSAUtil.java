@@ -11,14 +11,13 @@ import java.security.spec.*;
 import java.util.Base64;
 
 /**
- * RSA工具类
+ * RSA工具类，包含加密和数字签名的功能
  *
  * @author TianJingli
  */
 public class RSAUtil {
     /**
      * 获取RSA公钥/私钥对
-     *
      * @return
      */
     public static KeyPair getRSAKeyPair() {
@@ -33,7 +32,6 @@ public class RSAUtil {
 
     /**
      * 把公钥导出为字节
-     *
      * @param publicKey
      * @return
      */
@@ -43,7 +41,6 @@ public class RSAUtil {
 
     /**
      * 把字节转换为公钥
-     *
      * @param publicKeyBytes
      * @return
      */
@@ -61,7 +58,6 @@ public class RSAUtil {
 
     /**
      * 把私钥导出为字节
-     *
      * @param privateKey
      * @return
      */
@@ -71,7 +67,6 @@ public class RSAUtil {
 
     /**
      * 把字节转换为私钥
-     *
      * @param privateKeyBytes
      * @return
      */
@@ -86,8 +81,12 @@ public class RSAUtil {
             throw new RuntimeException(e);
         }
     }
-
-    // 用公钥加密:
+    /**
+     * 用公钥加密
+     * @param data
+     * @param publicKey
+     * @return
+     */
     public static byte[] encrypt(byte[] data, PublicKey publicKey) {
         Cipher cipher = null;
         try {
@@ -99,7 +98,12 @@ public class RSAUtil {
         }
     }
 
-    // 用私钥解密:
+    /**
+     * 用私钥解密
+     * @param encrypted
+     * @param privateKey
+     * @return
+     */
     public static byte[] decrypt(byte[] encrypted, PrivateKey privateKey) {
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -112,7 +116,6 @@ public class RSAUtil {
 
     /**
      * 用私钥进行签名
-     *
      * @param data
      * @param privateKey
      * @return
