@@ -1,9 +1,6 @@
 package com.tjl.util;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -16,6 +13,9 @@ import java.util.Base64;
  * @author TianJingli
  */
 public class RSAUtil {
+
+    // RSA密钥长度，须在512-16384之间
+    private static final int RSA_KEY_SIZE = 1024;
     /**
      * 获取RSA公钥/私钥对
      * @return
@@ -23,7 +23,8 @@ public class RSAUtil {
     public static KeyPair getRSAKeyPair() {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(1024);
+
+            keyPairGenerator.initialize(RSA_KEY_SIZE);
             return keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
