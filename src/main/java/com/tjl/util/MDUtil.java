@@ -34,12 +34,12 @@ public class MDUtil {
     }
 
     /**
-     * 将32位MD5转换为16位
-     * @param md5_32
+     * 将32字节的MD5转换为16字节
+     * @param md5_32B
      * @return
      */
-    public static String transMd5To16(String md5_32) {
-        return md5_32.toString().substring(8, 24);
+    public static String transMd5To16(String md5_32B) {
+        return md5_32B.toString().substring(8, 24);
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
