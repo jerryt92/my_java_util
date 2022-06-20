@@ -15,7 +15,7 @@ import java.util.Base64;
 public class RSAUtil {
 
     // RSA密钥长度，须在512-16384之间
-    private static final int RSA_KEY_SIZE = 1024;
+    private static final int RSA_KEY_SIZE = 512;
     /**
      * 获取RSA公钥/私钥对
      * @return
