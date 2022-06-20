@@ -39,7 +39,7 @@ public class MDUtil {
      * @return
      */
     public static String transMd5To16(String md5_32B) {
-        return md5_32B.toString().substring(8, 24);
+        return md5_32B.substring(8, 24);
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
