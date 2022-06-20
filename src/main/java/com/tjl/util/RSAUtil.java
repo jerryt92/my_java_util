@@ -146,20 +146,28 @@ public class RSAUtil {
 
         String msg = "Hello RSA.";
         System.out.println("原文：" + msg);
+        // 获取公钥/私钥对
         KeyPair keyPair = getRSAKeyPair();
+        // 将公钥/私钥转为可明文显示的字符串
         String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
         String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
+        // 明文显示公钥/私钥
         System.out.println("PublicKey : " + publicKeyStr);
         System.out.println("PrivateKey : " + privateKeyStr);
+        // 使用公钥进行加密（先将字符串类型的公钥转换为PublicKey类型），并将加密的字节码转为可明文显示的字符串
         String encrypted = Base64.getEncoder().encodeToString(encrypt(msg.getBytes(StandardCharsets.UTF_8), getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr))));
+        // 明文显示加密后的数据
         System.out.println("Encrypted : " + encrypted);
+        // 使用私钥进行解密
         System.out.println("Decrypted : " + new String(decrypt(Base64.getDecoder().decode(encrypted), getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr))), "UTF-8"));
 
         // 数字签名演示
 
         String myInfo = "TianJingli";
+        // 使用私钥进行签名
         String signed = Base64.getEncoder().encodeToString(sign(myInfo.getBytes(StandardCharsets.UTF_8), keyPair.getPrivate()));
         System.out.println("Signed : " + signed);
+        // 用公钥解密签名内容
         System.out.println("Signer : "+new String(decryptSign(Base64.getDecoder().decode(signed),keyPair.getPublic()),"UTF-8"));
     }
 }
