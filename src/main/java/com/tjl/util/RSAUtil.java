@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.*;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * RSA工具类，包含加密和数字签名的功能
@@ -164,11 +166,17 @@ public class RSAUtil {
 
         // 数字签名演示
 
-        String myInfo = "TianJingli";
+        // 获取证书
+        KeyPair certificate = getRSAKeyPair();
+        HashMap<KeyPair,Object> infoMap = new HashMap<>();
+        // 数字签名使用私钥加密原数据的摘要
+        String msg_md = MDUtil.getMessageDigest(msg.getBytes(), "MD5");
         // 使用私钥进行签名
-        String signed = Base64.getEncoder().encodeToString(sign(myInfo.getBytes(StandardCharsets.UTF_8), keyPair.getPrivate()));
+        String signed = Base64.getEncoder().encodeToString(sign(msg_md.getBytes(StandardCharsets.UTF_8), certificate.getPrivate()));
         System.out.println("Signed : " + signed);
         // 用公钥解密签名内容
-        System.out.println("Signer : "+new String(decryptSign(Base64.getDecoder().decode(signed),keyPair.getPublic()),"UTF-8"));
+        System.out.println("Signer : "+new String(decryptSign(Base64.getDecoder().decode(signed),certificate.getPublic()),"UTF-8"));
+        // 验证
+        System.out.println(MDUtil.getMessageDigest(msg.getBytes(), "MD5").equals(new String(decryptSign(Base64.getDecoder().decode(signed),certificate.getPublic()))));
     }
 }
