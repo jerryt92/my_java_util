@@ -1,14 +1,11 @@
-package com.tjl.userTruthCircleDemo.dao;
+package org.tjl.userTruthCircleDemo.dao;
 
-import com.tjl.userTruthCircleDemo.entity.NodeEntity;
-import com.tjl.userTruthCircleDemo.jdbcutil.JdbcUtil;
+import org.tjl.userTruthCircleDemo.entity.NodeEntity;
+import org.tjl.userTruthCircleDemo.jdbcutil.JdbcUtil;
 
-import java.security.GeneralSecurityException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class NodeDao {
 

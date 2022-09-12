@@ -1,4 +1,4 @@
-package com.tjl.userTruthCircleDemo.entity;
+package org.tjl.userTruthCircleDemo.entity;
 
 public class User {
     private String id;

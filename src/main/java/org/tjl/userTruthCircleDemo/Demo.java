@@ -1,6 +1,6 @@
-package com.tjl.userTruthCircleDemo;
+package org.tjl.userTruthCircleDemo;
 
-import com.tjl.userTruthCircleDemo.service.NodeService;
+import org.tjl.userTruthCircleDemo.service.NodeService;
 
 public class Demo {
     public static void main(String[] args) {

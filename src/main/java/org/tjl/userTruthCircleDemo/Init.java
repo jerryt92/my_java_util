@@ -1,8 +1,8 @@
-package com.tjl.userTruthCircleDemo;
+package org.tjl.userTruthCircleDemo;
 
-import com.tjl.userTruthCircleDemo.dao.NodeDao;
-import com.tjl.userTruthCircleDemo.entity.NodeEntity;
-import com.tjl.userTruthCircleDemo.entity.User;
+import org.tjl.userTruthCircleDemo.dao.NodeDao;
+import org.tjl.userTruthCircleDemo.entity.NodeEntity;
+import org.tjl.userTruthCircleDemo.entity.User;
 
 import java.util.UUID;
 

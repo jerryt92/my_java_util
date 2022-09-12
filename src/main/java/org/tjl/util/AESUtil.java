@@ -1,4 +1,4 @@
-package com.tjl.util;
+package org.tjl.util;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

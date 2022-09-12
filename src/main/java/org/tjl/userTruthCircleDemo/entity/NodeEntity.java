@@ -1,6 +1,7 @@
-package com.tjl.userTruthCircleDemo.entity;
+package org.tjl.userTruthCircleDemo.entity;
 
-import com.tjl.util.MDUtil;
+import org.tjl.util.MDUtil;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;

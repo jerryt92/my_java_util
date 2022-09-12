@@ -1,4 +1,4 @@
-package com.tjl.util;
+package org.tjl.util;
 
 import javax.crypto.Cipher;
 import java.io.UnsupportedEncodingException;
@@ -7,7 +7,6 @@ import java.security.*;
 import java.security.spec.*;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * RSA工具类，包含加密和数字签名的功能

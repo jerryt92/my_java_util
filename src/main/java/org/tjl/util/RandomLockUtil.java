@@ -1,4 +1,4 @@
-package com.tjl.util;
+package org.tjl.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
