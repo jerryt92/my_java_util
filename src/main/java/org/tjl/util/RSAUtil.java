@@ -1,7 +1,6 @@
 package org.tjl.util;
 
 import javax.crypto.Cipher;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.*;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 public class RSAUtil {
 
     // RSA密钥长度，须在512-16384之间
-    private static final int RSA_KEY_SIZE = 512;
+    private static final int RSA_KEY_SIZE = 1024;
     /**
      * 获取RSA公钥/私钥对
      * @return
@@ -142,7 +141,7 @@ public class RSAUtil {
         return cipher.doFinal(signedData);
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException, GeneralSecurityException {
+    public static void main(String[] args) throws Exception {
 
         // 加密解密演示
 
@@ -151,8 +150,10 @@ public class RSAUtil {
         // 获取公钥/私钥对
         KeyPair keyPair = getRSAKeyPair();
         // 将公钥/私钥转为可明文显示的字符串
-        String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
-        String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
+//        String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
+//        String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
+        String publicKeyStr = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcV42kb1PYv5Elj3mY2kKLhY7e7Oeb1pal7E5NH+tNyEUEATol00h1iTvymDk7VehIVKJy1hCY5z6rfubMoJW3hKdgdX9UzwpdfKrKWjf9//ak5yLXN9n7iFL7ng6n0V0r2/k+ispcQqsG8bPKJAHnSBDsGMJZKJfJo08tx0hkmwIDAQAB";
+        String privateKeyStr = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJxXjaRvU9i/kSWPeZjaQouFjt7s55vWlqXsTk0f603IRQQBOiXTSHWJO/KYOTtV6EhUonLWEJjnPqt+5syglbeEp2B1f1TPCl18qspaN/3/9qTnItc32fuIUvueDqfRXSvb+T6KylxCqwbxs8okAedIEOwYwlkol8mjTy3HSGSbAgMBAAECgYAsimkJEspxcso4SDLdUDkrJKa6bgXiCPWsWbFJGbHg3BCFfpABXLtE+Q8CI0oS1Huzt6D8VG4wEZlyJFo+q/Va+0x8dU+JcsUdFORqrlQfr4gX5k721BzbImjvycG7HMvz2ye6Jt+6cUvxbHnzetVW+FFUlioGQOcC2XuDsVuGkQJBAORHRN8s+p4M9EHy2y4gPDfzIaR73wXZFD4LY0DzLiQCXwQDQHV2Y+/XAt7lXrbcWZrmqzamTGyUOBlgXlYRcDMCQQCvU+wDMBrzmPqwvKEazkdqGH+fFKSK9ypK7FFRJOWJAXMd3aauNVzMVKhFmc+MO3PnfOtDq129mc3xclosRbH5AkEAtbjSZ8M7otP3IgS9XKPGrFd9IZ6GdPZROe8AzTSJN5s3nk8kYh2kAsqr+1qmonUZU8lq5K9PyWPYoMLpdiSdpwJBAJRmxG4uWaG26vqNrw+xamEzO1K7dkrpyrKANJQqVt8Qiw/MfTkXkeSiA4xmFHbuG7zkz34HnuDNPrQPxqOSmoECQELY/swtXk5Z4x0Ak9BTXFpCejOzgKPXqbPGLbbS6VER+5p0aaAyiyckVCeN5AeVCI359l128Barq25LpXn8Iws=";
         // 明文显示公钥/私钥
         System.out.println("PublicKey : " + publicKeyStr);
         System.out.println("PrivateKey : " + privateKeyStr);
@@ -169,7 +170,7 @@ public class RSAUtil {
         KeyPair certificate = getRSAKeyPair();
         HashMap<KeyPair,Object> infoMap = new HashMap<>();
         // 数字签名使用私钥加密原数据的摘要
-        String msg_md = MDUtil.getMessageDigest(msg.getBytes(), "MD5");
+        String msg_md = MDUtil.getMessageDigest(msg.getBytes(), "SHA-256");
         // 使用私钥进行签名
         String signed = Base64.getEncoder().encodeToString(sign(msg_md.getBytes(StandardCharsets.UTF_8), certificate.getPrivate()));
         System.out.println("Signed : " + signed);

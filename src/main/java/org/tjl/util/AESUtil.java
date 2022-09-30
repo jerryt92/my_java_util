@@ -2,16 +2,27 @@ package org.tjl.util;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.UUID;
 
 /**
  * @author TianJingli
  */
 public class AESUtil {
+    private static IvParameterSpec iv;
+
+    static {
+        try {
+            iv = new IvParameterSpec(MDUtil.transMd5To16(MDUtil.getMessageDigest("tjlaes2022".getBytes(StandardCharsets.UTF_8),"MD5")).getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * AES加密
      * @param key AES密钥必须为16位(AES-128)或32位(AES-256)
@@ -20,9 +31,9 @@ public class AESUtil {
      * @throws GeneralSecurityException
      */
     public static byte[] aesEncrypt(byte[] data,byte[] key) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         SecretKey keySpec = new SecretKeySpec(key,"AES");
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
         return cipher.doFinal(data);
     }
 
@@ -34,9 +45,9 @@ public class AESUtil {
      * @throws GeneralSecurityException
      */
     public static byte[] aesDecrypt(byte[] encryptData,byte[] key) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         SecretKey keySpec = new SecretKeySpec(key,"AES");
-        cipher.init(Cipher.DECRYPT_MODE, keySpec);
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
         return cipher.doFinal(encryptData);
     }
 
@@ -45,8 +56,9 @@ public class AESUtil {
         String message = "Hello, world!";
         System.out.println("Message: " + message);
         // 128位密钥 = 16 bytes Key:
-        String key = UUID.randomUUID().toString().replace("-","").substring(0, 16);
-        System.out.println(key);
+//        String key = UUID.randomUUID().toString().replace("-","").substring(0, 16);
+        String key = MDUtil.getMessageDigest("123".getBytes(StandardCharsets.UTF_8), "MD5");
+        System.out.println("key = " + key);
         // 加密:
         String encrypted = Base64.getEncoder().encodeToString(aesEncrypt(message.getBytes(StandardCharsets.UTF_8),key.getBytes()));
         System.out.println("encrypted: " + encrypted);
