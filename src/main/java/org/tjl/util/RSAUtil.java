@@ -1,11 +1,13 @@
 package org.tjl.util;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.*;
 import java.util.Base64;
-import java.util.HashMap;
 
 /**
  * RSA工具类，包含加密和数字签名的功能
@@ -16,8 +18,13 @@ public class RSAUtil {
 
     // RSA密钥长度，须在512-16384之间
     private static final int RSA_KEY_SIZE = 1024;
+    // 数字签名算法
+    public static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+
+
     /**
      * 获取RSA公钥/私钥对
+     *
      * @return
      */
     public static KeyPair getRSAKeyPair() {
@@ -33,6 +40,7 @@ public class RSAUtil {
 
     /**
      * 把公钥导出为字节
+     *
      * @param publicKey
      * @return
      */
@@ -42,6 +50,7 @@ public class RSAUtil {
 
     /**
      * 把字节转换为公钥
+     *
      * @param publicKeyBytes
      * @return
      */
@@ -59,6 +68,7 @@ public class RSAUtil {
 
     /**
      * 把私钥导出为字节
+     *
      * @param privateKey
      * @return
      */
@@ -68,6 +78,7 @@ public class RSAUtil {
 
     /**
      * 把字节转换为私钥
+     *
      * @param privateKeyBytes
      * @return
      */
@@ -82,8 +93,10 @@ public class RSAUtil {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * 用公钥加密
+     *
      * @param data
      * @param publicKey
      * @return
@@ -101,6 +114,7 @@ public class RSAUtil {
 
     /**
      * 用私钥解密
+     *
      * @param encrypted
      * @param privateKey
      * @return
@@ -116,35 +130,53 @@ public class RSAUtil {
     }
 
     /**
-     * 用私钥进行签名
-     * @param data
-     * @param privateKey
-     * @return
+     * 签名（除去换行和空格）
+     *
+     * @param privateKeyStr 私钥
+     * @param data          签名内容
+     * @return signature 签名值
      */
-    public static byte[] sign(byte[] data, PrivateKey privateKey) {
-        Cipher cipher = null;
+    public static String sign(String privateKeyStr, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        data = data.replaceAll("\n", "").replaceAll(" ", "");
         try {
-            cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            return cipher.doFinal(data);
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            PrivateKey privateKey = RSAUtil.getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr));
+            Signature Sign = Signature.getInstance(SIGNATURE_ALGORITHM);
+            Sign.initSign(privateKey);
+            Sign.update(data.getBytes());
+            String signature = Base64.getEncoder().encodeToString(Sign.sign());
+            return signature;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     /**
-     * 用公钥解密签名
+     * 验签（除去换行和空格）
+     *
+     * @param publicKeyStr 公钥
+     * @param data         验签内容
+     * @param signature    签名值
+     * @return 验签结果
      */
-    public static byte[] decryptSign(byte[] signedData, PublicKey publicKey) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, publicKey);
-        return cipher.doFinal(signedData);
+    public static boolean verifySign(String publicKeyStr, String data, String signature) {
+        data = data.replaceAll("\n", "").replaceAll(" ", "");
+        try {
+            PublicKey publicKey = RSAUtil.getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr));
+            Signature verifySign = Signature.getInstance(SIGNATURE_ALGORITHM);
+            verifySign.initVerify(publicKey);
+            verifySign.update(data.getBytes());
+            return verifySign.verify(Base64.getDecoder().decode(signature.substring(0, 172)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static void main(String[] args) throws Exception {
 
         // 加密解密演示
-
+        System.out.println("\n===========加密解密演示===========\n");
         String msg = "Hello RSA.";
         System.out.println("原文：" + msg);
         // 获取公钥/私钥对
@@ -165,18 +197,14 @@ public class RSAUtil {
         System.out.println("Decrypted : " + new String(decrypt(Base64.getDecoder().decode(encrypted), getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr))), "UTF-8"));
 
         // 数字签名演示
-
-        // 获取证书
-        KeyPair certificate = getRSAKeyPair();
-        HashMap<KeyPair,Object> infoMap = new HashMap<>();
-        // 数字签名使用私钥加密原数据的摘要
-        String msg_md = MDUtil.getMessageDigest(msg.getBytes(), "SHA-256");
-        // 使用私钥进行签名
-        String signed = Base64.getEncoder().encodeToString(sign(msg_md.getBytes(StandardCharsets.UTF_8), certificate.getPrivate()));
-        System.out.println("Signed : " + signed);
-        // 用公钥解密签名内容
-        System.out.println("Signer : "+new String(decryptSign(Base64.getDecoder().decode(signed),certificate.getPublic()),"UTF-8"));
-        // 验证
-        System.out.println(MDUtil.getMessageDigest(msg.getBytes(), "MD5").equals(new String(decryptSign(Base64.getDecoder().decode(signed),certificate.getPublic()))));
+        System.out.println("\n===========数字签名演示===========\n");
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvPulcPnrUBap/nYlO/7pn9JGikc95Qxsa/I6+GS4+beZIQPa295Yelv2CE52emJ2cTioAVBE8Ulm6LSsJLilUVEzPtzQEF4APmrHa24aI1gAybPvJ3flXVqVJVpaX2qezVBKURMAAjLlcSWF04vGZIfs27hE6n91j0XQzjo97yQIDAQAB";
+        System.out.println("公钥： " + publicKey);
+        String privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAK8+6Vw+etQFqn+diU7/umf0kaKRz3lDGxr8jr4ZLj5t5khA9rb3lh6W/YITnZ6YnZxOKgBUETxSWbotKwkuKVRUTM+3NAQXgA+asdrbhojWADJs+8nd+VdWpUlWlpfap7NUEpREwACMuVxJYXTi8Zkh+zbuETqf3WPRdDOOj3vJAgMBAAECgYAso8Ph4XB8Ta0usLxnSTD8hgoK9UV6SCPBbhAWUGe9M1VzlkjCNrMgu6l71u9RlOKhDDAawU9apEeC6zqJLh8MlS4EVnFJy/2I7OOr0ZdEL63ZNJF1DRlaqF0PBBpegz6mB/3vqfcNfRPi79+W2/l/PRD66syz6QIgrxhTr0bmAQJBAPOT3PtwNjT8le3IdtN0VE/J8mh4bdj8YId1DyChaLDUx2QdgabRNJrLiV5xJkCW+8sEGZHQpuLLJzFgch6q5qECQQC4LulHt2j2PpO8+TSYyOhy645HwvloacDVwYzJVcjLOILC17oi59fP7Qa4+D1IJh7B2ImJKJUfhTjlQKTjwQwpAkB5CjZbAFT/mbELe32I8JrhF3KNdaLom+mABqygw3TZwrLezkbaVcW1UoWN195xZFX1ebEXI796ngd44vtyv+xhAkAvTpVKf1htTxthQVz6FThnNAuCcRjgcbE+9gy0Nd1yHRyw8Pn1NzleRZIhdlk/K9NglL6WxR6wTuaTM6xmd1IpAkEA3GFZOV0vQytMxugdwUyA7ZttpY1liC3dOaJhPLICjdDZO8SoCqe5bZ9Ek5lmOWqRh7TROplOHAkotG0o2zR/LQ==";
+        System.out.println("私钥： " + privateKey);
+        System.out.println("原文：" + msg);
+        String signature = sign(privateKey, msg);
+        System.out.println("签名值：" + signature);
+        System.out.println("验签结果：" + verifySign(publicKey, msg, signature));
     }
 }
