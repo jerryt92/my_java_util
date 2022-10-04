@@ -1,10 +1,7 @@
 package org.tjl;
 
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-
 public class Main {
-    public static void main(String[] args) throws GeneralSecurityException, UnsupportedEncodingException {
+    public static void main(String[] args) {
         System.out.println("Hello world.");
     }
 }

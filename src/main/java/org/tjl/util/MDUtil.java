@@ -14,8 +14,8 @@ public class MDUtil {
      * 信息摘要
      *
      * @param data
-     * @param algorithm 可选：MD5 、 SHA-1 、 SHA-256 、 SHA-384 、 SHA-512
-     * @return
+     * @param algorithm 可选：MD2 / MD5 / SHA-1 / SHA-224 / SHA-256 / SHA-384 / SHA-512
+     * @return messageDigest
      */
     public static String getMessageDigest(byte[] data, String algorithm) throws NoSuchAlgorithmException {
         StringBuilder stringBuilder = new StringBuilder();

@@ -6,7 +6,7 @@
 
     <groupId>org.tjl.util</groupId>
     <artifactId>TJLUtil</artifactId>
-    <version>3.3</version>
+    <version>4.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
