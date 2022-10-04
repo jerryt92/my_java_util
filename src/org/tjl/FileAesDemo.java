@@ -9,9 +9,9 @@ import java.nio.charset.StandardCharsets;
 
 public class FileAesDemo {
     public static void main(String[] args) throws Exception {
-        File encryptedFile = new File("/Users/tjl/Downloads/UML.png.aes.bin");
+        File encryptedFile = new File("");
         byte[] bytes = AESUtil.aesDecrypt(FileUtils.readFileToByteArray(encryptedFile), MDUtil.getMessageDigest("123".getBytes(StandardCharsets.UTF_8), "MD5").getBytes(StandardCharsets.UTF_8));
-        File file = new File("/Users/tjl/Downloads/UML.png");
+        File file = new File("");
         FileUtils.writeByteArrayToFile(file,bytes);
     }
 
