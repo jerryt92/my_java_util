@@ -2,6 +2,10 @@
 
 信息摘要工具类、AES加密工具类、RSA工具类、密码加盐
 
+[GitHub](https://github.com/tianjingli/util)
+
+[Gitee](https://gitee.com/tianjingli/util)
+
 ## 关于AES-256的限制
 
 在使用AES-256时出现
