@@ -60,7 +60,7 @@ public class SaltUtil {
      */
     public static boolean verifyEncryptedValue(String data, String encryptedValue, String algorithm) throws Exception {
         try {
-            MessageDigest.getInstance(algorithm.toUpperCase());
+            MessageDigest.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw e;
