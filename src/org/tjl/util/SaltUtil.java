@@ -37,20 +37,27 @@ public class SaltUtil {
     }
 
     /**
-     *
+     * 数据加盐
      * @param data 待加盐数据
      * @param algorithm 摘要算法，可选：MD2 / MD5 / SHA-1 / SHA-224 / SHA-256 / SHA-384 / SHA-512
-     * @return encryptedValue
+     * @return 加盐后的密文
      * @throws Exception
      */
     public static String saltEncrypt(String data, String algorithm) throws Exception {
         verifyConfig();
         int saltLength = SALT_MAX_LENGTH - (int)(Math.random()*(SALT_MAX_LENGTH-SALT_MIN_LENGTH+1));
         String salt = UUID.randomUUID().toString().replaceAll("-", "").substring(0, saltLength);
-        String encryptedValue = salt + MDUtil.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase());
-        return encryptedValue;
+        return salt + MDUtil.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase());
     }
 
+    /**
+     * 密文验证
+     * @param data 待验证数据
+     * @param encryptedValue 加盐后的密文
+     * @param algorithm 摘要算法，可选：MD2 / MD5 / SHA-1 / SHA-224 / SHA-256 / SHA-384 / SHA-512
+     * @return 验证结果
+     * @throws Exception
+     */
     public static boolean verifyEncryptedValue(String data, String encryptedValue, String algorithm) throws Exception {
         try {
             MessageDigest.getInstance(algorithm.toUpperCase());

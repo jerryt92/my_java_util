@@ -1,8 +1,6 @@
 # 一个Java工具类
 
-信息摘要工具类、AES加密工具类、RSA工具类
-
-[Jar包下载](target/TJLUtil-3.3.jar)
+信息摘要工具类、AES加密工具类、RSA工具类、密码加盐
 
 ## 关于AES-256的限制
 
