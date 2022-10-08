@@ -2,9 +2,21 @@
 
 信息摘要工具类、AES加密工具类、RSA工具类、密码加盐
 
-[GitHub](https://github.com/tianjingli/util)
+[GitHub](https://github.com/tianjingli/my_java_util)
 
-[Gitee](https://gitee.com/tianjingli/util)
+[Gitee](https://gitee.com/tianjingli/my_java_util)
+
+## 密码加盐工具类
+
+1. **什么是加盐**？ 
+   
+   为了避免用户的简单密码可以被轻易识别，在生成摘要时，我们可以在原文中混入一段字符串，可以是一个固定的字符串，也可以是一个随机字符串。如果是后者，则这个随机字符串也需要被存储在服务器中。
+
+    对原文加盐可以有效地防范「彩虹表攻击」。
+
+3. **加盐的过程**
+
+![salt.jpg](./assets/salt.jpg)
 
 ## 关于AES-256的限制
 

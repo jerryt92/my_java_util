@@ -73,8 +73,8 @@ public class SaltUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        String str = "password";
-        String encryptedValue = saltEncrypt(str, "md5");
+        String str = "Hello World.";
+        String encryptedValue = saltEncrypt(str, "sha-256");
         // 加盐
         System.out.println(encryptedValue);
         // 验证

@@ -43,8 +43,8 @@ public class MDUtil {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        String msg = "11111111111111111111";
-        System.out.println(getMessageDigest(msg.getBytes(StandardCharsets.UTF_8), "md5"));
+        String msg = "f4bb1975bf1f81f76ce824f7536c1e101a8060a632a52289d530a6f600d52c92Hello World.";
+        System.out.println(getMessageDigest(msg.getBytes(StandardCharsets.UTF_8), "sha-256"));
         System.out.println(transMd5To16(getMessageDigest(msg.getBytes(StandardCharsets.UTF_8), "md5")));
     }
 }
