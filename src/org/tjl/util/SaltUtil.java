@@ -78,6 +78,6 @@ public class SaltUtil {
         // 加盐
         System.out.println(encryptedValue);
         // 验证
-        System.out.println(verifyEncryptedValue(str,encryptedValue,"md5"));
+        System.out.println(verifyEncryptedValue(str,encryptedValue,"sha-256"));
     }
 }
