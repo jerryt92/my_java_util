@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * @author TianJingli
+ * @author JerryT
  */
 public class AESUtil {
 

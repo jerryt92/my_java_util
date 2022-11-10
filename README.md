@@ -2,9 +2,7 @@
 
 信息摘要工具类、AES加密工具类、RSA工具类、密码加盐
 
-[GitHub](https://github.com/tianjingli/my_java_util)
-
-[Gitee](https://gitee.com/tianjingli/my_java_util)
+[GitHub](https://github.com/jerryt92/my_java_util)
 
 ## 密码加盐工具类
 

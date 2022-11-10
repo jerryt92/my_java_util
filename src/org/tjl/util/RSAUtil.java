@@ -12,7 +12,7 @@ import java.util.Base64;
 /**
  * RSA工具类，包含加密和数字签名的功能
  *
- * @author TianJingli
+ * @author JerryT
  */
 public class RSAUtil {
 

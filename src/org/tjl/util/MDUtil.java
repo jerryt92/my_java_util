@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * 信息摘要工具类
  *
- * @author TianJingli
+ * @author JerryT
  */
 public class MDUtil {
     /**
