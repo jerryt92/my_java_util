@@ -1,4 +1,4 @@
-package org.tjl.util;
+package io.jerryt.util;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

@@ -1,4 +1,4 @@
-package org.tjl.example;
+package io.jerryt.example;
 
 public class SystemPropertyDemo {
     public static void main(String[] args) throws Exception {

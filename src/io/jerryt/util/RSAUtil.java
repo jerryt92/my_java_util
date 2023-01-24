@@ -1,4 +1,4 @@
-package org.tjl.util;
+package io.jerryt.util;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

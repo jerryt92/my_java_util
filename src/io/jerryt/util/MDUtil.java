@@ -1,4 +1,4 @@
-package org.tjl.util;
+package io.jerryt.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

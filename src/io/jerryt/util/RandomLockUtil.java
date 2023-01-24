@@ -1,4 +1,4 @@
-package org.tjl.util;
+package io.jerryt.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

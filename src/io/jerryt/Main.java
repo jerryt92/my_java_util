@@ -1,4 +1,4 @@
-package org.tjl;
+package io.jerryt;
 
 public class Main {
     public static void main(String[] args) {
