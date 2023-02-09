@@ -1,4 +1,4 @@
-package io.jerryt.util;
+package io.jerryt92.util;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
