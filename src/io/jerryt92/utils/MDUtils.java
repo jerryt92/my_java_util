@@ -1,4 +1,4 @@
-package io.jerryt92.util;
+package io.jerryt92.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author JerryT
  */
-public class MDUtil {
+public class MDUtils {
     /**
      * 信息摘要
      *

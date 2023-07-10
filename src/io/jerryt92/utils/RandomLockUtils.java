@@ -1,4 +1,4 @@
-package io.jerryt92.util;
+package io.jerryt92.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -8,7 +8,7 @@ import java.net.URLEncoder;
  * 可以产生随机的密文，或根据密文解析出原文
  * @author tjl
  */
-public class RandomLockUtil {
+public class RandomLockUtils {
     /**
      * 生成密文
      * @param str

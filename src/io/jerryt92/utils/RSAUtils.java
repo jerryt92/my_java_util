@@ -1,4 +1,4 @@
-package io.jerryt92.util;
+package io.jerryt92.utils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -14,7 +14,7 @@ import java.util.Base64;
  *
  * @author JerryT
  */
-public class RSAUtil {
+public class RSAUtils {
 
     // RSA密钥长度，须在512-16384之间
     private static final int RSA_KEY_SIZE = 1024;
@@ -139,7 +139,7 @@ public class RSAUtil {
     public static String sign(String privateKeyStr, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         data = data.replaceAll("\n", "").replaceAll(" ", "");
         try {
-            PrivateKey privateKey = RSAUtil.getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr));
+            PrivateKey privateKey = RSAUtils.getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr));
             Signature Sign = Signature.getInstance(SIGNATURE_ALGORITHM);
             Sign.initSign(privateKey);
             Sign.update(data.getBytes());
@@ -162,7 +162,7 @@ public class RSAUtil {
     public static boolean verifySign(String publicKeyStr, String data, String signature) {
         data = data.replaceAll("\n", "").replaceAll(" ", "");
         try {
-            PublicKey publicKey = RSAUtil.getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr));
+            PublicKey publicKey = RSAUtils.getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr));
             Signature verifySign = Signature.getInstance(SIGNATURE_ALGORITHM);
             verifySign.initVerify(publicKey);
             verifySign.update(data.getBytes());

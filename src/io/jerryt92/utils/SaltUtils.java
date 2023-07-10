@@ -1,4 +1,4 @@
-package io.jerryt92.util;
+package io.jerryt92.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -11,7 +11,7 @@ import java.util.UUID;
  * 密码加盐工具类
  * @author tjl
  */
-public class SaltUtil {
+public class SaltUtils {
     // 设置随机盐值最大长度
     // SALT_MIN_LENGTH ~ 32
     private static final int SALT_MAX_LENGTH = 32;
@@ -47,7 +47,7 @@ public class SaltUtil {
         verifyConfig();
         int saltLength = SALT_MAX_LENGTH - (int)(Math.random()*(SALT_MAX_LENGTH-SALT_MIN_LENGTH+1));
         String salt = UUID.randomUUID().toString().replaceAll("-", "").substring(0, saltLength);
-        return salt + MDUtil.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase());
+        return salt + MDUtils.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase());
     }
 
     /**
@@ -69,7 +69,7 @@ public class SaltUtil {
         String salt = encryptedValue.substring(0, encryptedValue.length() - algorithmLengthMap.get(algorithm.toUpperCase()));
         // 从密文中获取哈希值
         String hash = encryptedValue.substring(salt.length());
-        return MDUtil.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase()).equals(hash);
+        return MDUtils.getMessageDigest((salt + data).getBytes(StandardCharsets.UTF_8), algorithm.toUpperCase()).equals(hash);
     }
 
     public static void main(String[] args) throws Exception {
