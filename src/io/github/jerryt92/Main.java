@@ -1,4 +1,4 @@
-package io.jerryt92;
+package io.github.jerryt92;
 
 public class Main {
     public static void main(String[] args) {
