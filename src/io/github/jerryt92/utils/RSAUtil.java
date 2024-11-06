@@ -1,12 +1,22 @@
-package io.github.jerryt92.utils;
+package com.nms.platsvc.tunnel.util;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.spec.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
@@ -21,10 +31,11 @@ public class RSAUtil {
      * RSA密钥长度，须在512-16384之间
      */
     private static final int RSA_KEY_SIZE = 1024;
+    private static final String ALGORITHM = "RSA";
     /**
      * 数字签名算法
      */
-    public static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
 
     /**
      * 生成RSA公钥/私钥对
@@ -32,7 +43,7 @@ public class RSAUtil {
      * @return keyPair
      */
     public static KeyPair generateRSAKeyPair() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
         keyPairGenerator.initialize(RSA_KEY_SIZE);
         return keyPairGenerator.generateKeyPair();
     }
@@ -54,10 +65,25 @@ public class RSAUtil {
      * @return
      */
     public static PublicKey getPublicKeyFromBytes(byte[] publicKeyBytes)
-        throws NoSuchAlgorithmException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
         PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
         return publicKey;
+    }
+    /**
+     * 从PEM格式的公钥字符串中获取公钥
+     * @param pem
+     * @return
+     * @throws Exception
+     */
+    public static PublicKey getPublicKeyFromPEM(String pem) throws Exception {
+        String publicKeyPEM = pem.replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        return keyFactory.generatePublic(keySpec);
     }
 
     /**
@@ -77,8 +103,8 @@ public class RSAUtil {
      * @return
      */
     public static PrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes)
-        throws NoSuchAlgorithmException, InvalidKeySpecException {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
         PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         return privateKey;
     }
@@ -91,10 +117,10 @@ public class RSAUtil {
      * @return
      */
     public static byte[] encrypt(byte[] data, PublicKey publicKey)
-        throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
-        BadPaddingException {
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
+            BadPaddingException {
         Cipher cipher = null;
-        cipher = Cipher.getInstance("RSA");
+        cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return cipher.doFinal(data);
 
@@ -108,9 +134,9 @@ public class RSAUtil {
      * @return
      */
     public static byte[] decrypt(byte[] encrypted, PrivateKey privateKey)
-        throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
-        BadPaddingException {
-        Cipher cipher = Cipher.getInstance("RSA");
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
+            BadPaddingException {
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         return cipher.doFinal(encrypted);
     }
@@ -123,7 +149,7 @@ public class RSAUtil {
      * @return signature 签名值
      */
     public static String sign(String privateKeyStr, String data)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, SignatureException, InvalidKeyException, InvalidKeySpecException {
         PrivateKey privateKey = RSAUtil.getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr));
         Signature Sign = Signature.getInstance(SIGNATURE_ALGORITHM);
         Sign.initSign(privateKey);
@@ -141,7 +167,7 @@ public class RSAUtil {
      * @return 验签结果
      */
     public static boolean verifySign(String publicKeyStr, String data, String signature)
-        throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
         PublicKey publicKey = RSAUtil.getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr));
         Signature verifySign = Signature.getInstance(SIGNATURE_ALGORITHM);
         verifySign.initVerify(publicKey);
@@ -157,34 +183,28 @@ public class RSAUtil {
         // 获取公钥/私钥对
         KeyPair keyPair = generateRSAKeyPair();
         // 将公钥/私钥转为可明文显示的字符串
-        //        String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
-        //        String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
-        String publicKeyStr =
-            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcV42kb1PYv5Elj3mY2kKLhY7e7Oeb1pal7E5NH+tNyEUEATol00h1iTvymDk7VehIVKJy1hCY5z6rfubMoJW3hKdgdX9UzwpdfKrKWjf9//ak5yLXN9n7iFL7ng6n0V0r2/k+ispcQqsG8bPKJAHnSBDsGMJZKJfJo08tx0hkmwIDAQAB";
-        String privateKeyStr =
-            "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJxXjaRvU9i/kSWPeZjaQouFjt7s55vWlqXsTk0f603IRQQBOiXTSHWJO/KYOTtV6EhUonLWEJjnPqt+5syglbeEp2B1f1TPCl18qspaN/3/9qTnItc32fuIUvueDqfRXSvb+T6KylxCqwbxs8okAedIEOwYwlkol8mjTy3HSGSbAgMBAAECgYAsimkJEspxcso4SDLdUDkrJKa6bgXiCPWsWbFJGbHg3BCFfpABXLtE+Q8CI0oS1Huzt6D8VG4wEZlyJFo+q/Va+0x8dU+JcsUdFORqrlQfr4gX5k721BzbImjvycG7HMvz2ye6Jt+6cUvxbHnzetVW+FFUlioGQOcC2XuDsVuGkQJBAORHRN8s+p4M9EHy2y4gPDfzIaR73wXZFD4LY0DzLiQCXwQDQHV2Y+/XAt7lXrbcWZrmqzamTGyUOBlgXlYRcDMCQQCvU+wDMBrzmPqwvKEazkdqGH+fFKSK9ypK7FFRJOWJAXMd3aauNVzMVKhFmc+MO3PnfOtDq129mc3xclosRbH5AkEAtbjSZ8M7otP3IgS9XKPGrFd9IZ6GdPZROe8AzTSJN5s3nk8kYh2kAsqr+1qmonUZU8lq5K9PyWPYoMLpdiSdpwJBAJRmxG4uWaG26vqNrw+xamEzO1K7dkrpyrKANJQqVt8Qiw/MfTkXkeSiA4xmFHbuG7zkz34HnuDNPrQPxqOSmoECQELY/swtXk5Z4x0Ak9BTXFpCejOzgKPXqbPGLbbS6VER+5p0aaAyiyckVCeN5AeVCI359l128Barq25LpXn8Iws=";
+        String publicKeyStr = Base64.getEncoder().encodeToString(getPublicKeyBytes(keyPair.getPublic()));
+        String privateKeyStr = Base64.getEncoder().encodeToString(getPrivateKeyBytes(keyPair.getPrivate()));
         // 明文显示公钥/私钥
         System.out.println("PublicKey : " + publicKeyStr);
         System.out.println("PrivateKey : " + privateKeyStr);
         // 使用公钥进行加密（先将字符串类型的公钥转换为PublicKey类型），并将加密的字节码转为可明文显示的字符串
         String encrypted = Base64.getEncoder().encodeToString(encrypt(msg.getBytes(StandardCharsets.UTF_8),
-            getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr))));
+                getPublicKeyFromBytes(Base64.getDecoder().decode(publicKeyStr))));
         // 明文显示加密后的数据
         System.out.println("Encrypted : " + encrypted);
         // 使用私钥进行解密
         System.out.println("Decrypted : " + new String(decrypt(Base64.getDecoder().decode(encrypted),
-            getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr))), "UTF-8"));
+                getPrivateKeyFromBytes(Base64.getDecoder().decode(privateKeyStr))), "UTF-8"));
         // 数字签名演示
         System.out.println("\n===========数字签名演示===========\n");
-        String publicKey =
-            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvPulcPnrUBap/nYlO/7pn9JGikc95Qxsa/I6+GS4+beZIQPa295Yelv2CE52emJ2cTioAVBE8Ulm6LSsJLilUVEzPtzQEF4APmrHa24aI1gAybPvJ3flXVqVJVpaX2qezVBKURMAAjLlcSWF04vGZIfs27hE6n91j0XQzjo97yQIDAQAB";
-        System.out.println("公钥： " + publicKey);
-        String privateKey =
-            "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAK8+6Vw+etQFqn+diU7/umf0kaKRz3lDGxr8jr4ZLj5t5khA9rb3lh6W/YITnZ6YnZxOKgBUETxSWbotKwkuKVRUTM+3NAQXgA+asdrbhojWADJs+8nd+VdWpUlWlpfap7NUEpREwACMuVxJYXTi8Zkh+zbuETqf3WPRdDOOj3vJAgMBAAECgYAso8Ph4XB8Ta0usLxnSTD8hgoK9UV6SCPBbhAWUGe9M1VzlkjCNrMgu6l71u9RlOKhDDAawU9apEeC6zqJLh8MlS4EVnFJy/2I7OOr0ZdEL63ZNJF1DRlaqF0PBBpegz6mB/3vqfcNfRPi79+W2/l/PRD66syz6QIgrxhTr0bmAQJBAPOT3PtwNjT8le3IdtN0VE/J8mh4bdj8YId1DyChaLDUx2QdgabRNJrLiV5xJkCW+8sEGZHQpuLLJzFgch6q5qECQQC4LulHt2j2PpO8+TSYyOhy645HwvloacDVwYzJVcjLOILC17oi59fP7Qa4+D1IJh7B2ImJKJUfhTjlQKTjwQwpAkB5CjZbAFT/mbELe32I8JrhF3KNdaLom+mABqygw3TZwrLezkbaVcW1UoWN195xZFX1ebEXI796ngd44vtyv+xhAkAvTpVKf1htTxthQVz6FThnNAuCcRjgcbE+9gy0Nd1yHRyw8Pn1NzleRZIhdlk/K9NglL6WxR6wTuaTM6xmd1IpAkEA3GFZOV0vQytMxugdwUyA7ZttpY1liC3dOaJhPLICjdDZO8SoCqe5bZ9Ek5lmOWqRh7TROplOHAkotG0o2zR/LQ==";
-        System.out.println("私钥： " + privateKey);
+        System.out.println("公钥： " + publicKeyStr);
+        System.out.println("私钥： " + privateKeyStr);
         System.out.println("原文：" + msg);
-        String signature = sign(privateKey, msg);
+        String signature = sign(privateKeyStr, msg);
         System.out.println("签名值：" + signature);
-        System.out.println("验签结果：" + verifySign(publicKey, msg, signature));
+        System.out.println("验签结果：" + verifySign(publicKeyStr, msg, signature));
+        PublicKey publicKey = getPublicKeyFromPEM("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDIPaXTqWrwO/bsE6D7pnT8Q5Yzw3QU3bOucOSfuIWcpwZc6mh7gHvrRZoHTkLwjooeKIxc6o4oKvXaQUjXRWqZyuH5Dy+xGQ5mi/3CwlE9/kCa/0wMN9+gA3RyNCK5skb03KZCNTnpOpXIEZlg60AVjjTpSu579GGcVg8TrT9xlD9TxQGo9FfFXkXvM1OXawM0PSoVNvsojdCHwl+IPwtzuN14cmTweUNHupGVU+MT+PraU76cFJ86X8XTTXEFnZkw4BaPCivZCZfKsW+Zf7AN/9l3C2Yzk/jYSNnUa/3ejJQ3Pq4/ZOD/l2wrhIYGEIZBp4rKPGPktjnuXQLGdOf4oML0QX3ze8HQbSb1ED+IUhUkE4Bls1tJ/iMT3oklpKvoT6T7I0XEcOs0f7QpzOZlOJNuS4uhC+4wD5vAvrj7qPMwXEqOc/LfTow+m9fDQjkxrHZDYN1pm66QvnVyekLfMYmDwxj3SudAPmkpIaRyZ4kOiDdSwV14rD5M1P35WhE= tianjingli92@outlook.com\n");
+        System.out.println(publicKey);
     }
 }
